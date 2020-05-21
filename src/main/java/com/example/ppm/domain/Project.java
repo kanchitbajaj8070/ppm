@@ -1,20 +1,34 @@
-package com.example.ppm;
+package com.example.ppm.domain;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.sun.istack.NotNull;
+import org.springframework.validation.annotation.Validated;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.Date;
 @Entity
 @Table
 public class Project {
     @Id
-@GeneratedValue(strategy = GenerationType.AUTO)
-private Long id;
-
- private  String projectName;
- private String projectIdentifier;//Never use project_id
-    // because when using foreign keys it creates problems
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    @NotBlank(message = "Please enter a project name")
+    private  String projectName;
+    @NotBlank(message="please enter a default value")
+    //we have to use a dependancy of hibernate-validator
+    @Size(min=4,max=5,message =  "Please enter a project Identifier of 4 or 5 words only")
+    @Column(updatable = false,unique = true)  // we dont want accident updation
+    private String projectIdentifier;//Never use project_id because when using foreign keys it creates problems
+ @NotBlank(message = "Please enter a valid description")
  private String description;
+ @JsonFormat(pattern = "yyyy-mm-dd")
  private Date start_date;
+ @JsonFormat(pattern = "yyyy-mm-dd")
  private Date end_date;
+    @JsonFormat(pattern = "yyyy-mm-dd")
  private Date created_at;
+    @JsonFormat(pattern = "yyyy-mm-dd")
  private Date updated_at;
 
     public Project() {
