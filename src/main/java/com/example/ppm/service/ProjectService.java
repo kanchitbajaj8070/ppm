@@ -1,7 +1,10 @@
 package com.example.ppm.service;
 
+import com.example.ppm.domain.Backlog;
 import com.example.ppm.domain.Project;
+import com.example.ppm.domain.ProjectTask;
 import com.example.ppm.exceptions.ProjectIdException;
+import com.example.ppm.repository.BacklogRepository;
 import com.example.ppm.repository.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,13 +14,26 @@ import java.util.List;
 
 @Service
 public class ProjectService {
+    @Autowired
+    private BacklogRepository backlogRepository;
 @Autowired
     private ProjectRepository projectRepository;
 public void saveOrUpdateProject( Project project)
 {
 try
 {  project.setProjectIdentifier(project.getProjectIdentifier().toUpperCase());
-    projectRepository.save(project);
+if(project.getId()==null)
+{//backlog sets only on creation
+    Backlog b= new Backlog();
+    b.setProject(project);
+    project.setBacklog(b);
+    b.setProjectIdentifier(project.getProjectIdentifier().toUpperCase());
+}
+else//updating
+{
+    project.setBacklog(backlogRepository.findByProjectIdentifier(project.getProjectIdentifier()));
+}
+projectRepository.save(project);
 }
 catch (Exception e)
 {
@@ -47,4 +63,5 @@ public void deleteProjectByIdentifer( String projectId)
         throw new ProjectIdException( " Cant delete project"+projectId+" as it doesnt exisits");
     projectRepository.delete(project);
 }
+
 }

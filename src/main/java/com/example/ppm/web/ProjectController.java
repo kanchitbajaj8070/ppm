@@ -23,6 +23,7 @@ public class ProjectController {
     @Autowired
     private ValidationService validationService;
     @PutMapping("/api/project")
+    @CrossOrigin
     public ResponseEntity<?> updateProject ( @Valid @RequestBody Project project,BindingResult result)
     {
         ResponseEntity<Map<String,String> >errorMap= validationService.performValidation(result);
@@ -32,6 +33,7 @@ public class ProjectController {
         return new ResponseEntity<>(project, HttpStatus.OK);
     }
 @PostMapping("/api/project")
+@CrossOrigin
     public ResponseEntity<?> createNewProject(@Valid @RequestBody Project project, BindingResult result)
 {
     //if( result.hasErrors()){  /*  This is refactored into a new service of validation
@@ -57,16 +59,20 @@ public class ProjectController {
     return new ResponseEntity<>(project, HttpStatus.CREATED);
 }
 @GetMapping("/api/project/all")
+@CrossOrigin
 public List<Project> getAllProjects()
 {
+
     return projectService.getAllProjects();
 }
     @GetMapping("/api/project/{projectId}")
+    @CrossOrigin
     public Project getProjectByIdentifier(@PathVariable String projectId)
     {
         return projectService.getProjectByIdentifier(projectId);
     }
     @DeleteMapping("/api/project/{projectId}")
+    @CrossOrigin
     public ResponseEntity<?> deleteProjectByIdentifier( @PathVariable String projectId)
     {
         projectService.deleteProjectByIdentifer(projectId.toUpperCase());

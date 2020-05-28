@@ -1,10 +1,12 @@
 package com.example.ppm.domain;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.sun.istack.NotNull;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
 @Entity
@@ -23,13 +25,17 @@ public class Project {
  @NotBlank(message = "Please enter a valid description")
  private String description;
  @JsonFormat(pattern = "yyyy-mm-dd")
+ @NotNull(message="please enter a start date of the project")
  private Date start_date;
  @JsonFormat(pattern = "yyyy-mm-dd")
+ @NotNull(message="please enter a end date of project")
  private Date end_date;
     @JsonFormat(pattern = "yyyy-mm-dd")
+    @Column(updatable = false)
  private Date created_at;
     @JsonFormat(pattern = "yyyy-mm-dd")
  private Date updated_at;
+
 
     public Project() {
     }
@@ -98,5 +104,15 @@ public class Project {
         this.updated_at=new Date();
     }
 
+    @OneToOne(fetch=FetchType.EAGER,cascade = CascadeType.ALL, mappedBy = "project")
+    @JsonIgnore
+    private Backlog backlog;
 
+    public Backlog getBacklog() {
+        return backlog;
+    }
+
+    public void setBacklog(Backlog backlog) {
+        this.backlog = backlog;
+    }
 }
