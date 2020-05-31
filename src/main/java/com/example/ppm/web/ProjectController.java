@@ -12,27 +12,31 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
+@CrossOrigin
 public class ProjectController {
     @Autowired
     private ProjectService projectService;
     @Autowired
     private ValidationService validationService;
     @PutMapping("/api/project")
-    public ResponseEntity<?> updateProject ( @Valid @RequestBody Project project,BindingResult result)
+    @CrossOrigin
+    public ResponseEntity<?> updateProject ( @Valid @RequestBody Project project,BindingResult result,Principal principal)
     {
         ResponseEntity<Map<String,String> >errorMap= validationService.performValidation(result);
         if( errorMap!=null)
             return errorMap;
-        projectService.saveOrUpdateProject(project);
+        projectService.saveOrUpdateProject(project,principal.getName()) ;
         return new ResponseEntity<>(project, HttpStatus.OK);
     }
 @PostMapping("/api/project")
-    public ResponseEntity<?> createNewProject(@Valid @RequestBody Project project, BindingResult result)
+@CrossOrigin
+    public ResponseEntity<?> createNewProject(@Valid @RequestBody Project project, BindingResult result, Principal principal)
 {
     //if( result.hasErrors()){  /*  This is refactored into a new service of validation
     /*Map<String,String> errorMap= new HashMap<>();
@@ -53,23 +57,29 @@ public class ProjectController {
     /* the unique property of the project identifier still returns error .this happens because the constraint is at
     * database level . The error occured when we were trying to insert a record in the database and not at the time
     * of checking the values of request Body*/
-    projectService.saveOrUpdateProject(project);
+
+    projectService.saveOrUpdateProject(project,principal.getName().toLowerCase());
     return new ResponseEntity<>(project, HttpStatus.CREATED);
 }
 @GetMapping("/api/project/all")
-public List<Project> getAllProjects()
+@CrossOrigin
+public List<Project> getAllProjects(Principal principal)
 {
-    return projectService.getAllProjects();
+
+    return projectService.getAllProjects(principal.getName().toLowerCase());
 }
     @GetMapping("/api/project/{projectId}")
-    public Project getProjectByIdentifier(@PathVariable String projectId)
+    @CrossOrigin
+    public Project getProjectByIdentifier(@PathVariable String projectId,Principal principal)
     {
-        return projectService.getProjectByIdentifier(projectId);
+        return projectService.getProjectByIdentifier(projectId,principal.getName().toLowerCase());
     }
     @DeleteMapping("/api/project/{projectId}")
-    public ResponseEntity<?> deleteProjectByIdentifier( @PathVariable String projectId)
+    @CrossOrigin
+    public ResponseEntity<?> deleteProjectByIdentifier( @PathVariable String projectId,Principal principal)
     {
-        projectService.deleteProjectByIdentifer(projectId.toUpperCase());
+        projectService.deleteProjectByIdentifer(projectId.toUpperCase(),principal.getName().toLowerCase());
 return new ResponseEntity<String>("PROJECT WITH "+projectId+" DELETED",HttpStatus.OK);
+
     }
 }
